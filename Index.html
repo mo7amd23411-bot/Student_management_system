@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>نظام إدارة وتحليل نتائج الطلاب</title>
+</head>
+<body>
+<h2>افتح الـ Console بـ F12 عشان تشوف النتائج</h2>
+<script>
+// 1. هيكلة بيانات الطالب
+class Student {
+  constructor(id, name, grades, attendance) {
+    this.id = id;
+    this.name = name;
+    this.grades = grades; // مصفوفة 3 مواد
+    this.attendance = attendance;
+  }
+
+  // دالة حساب المتوسط باستخدام reduce
+  getAverage() {
+    const sum = this.grades.reduce((acc, grade) => acc + grade, 0);
+    return sum / this.grades.length;
+  }
+
+  // دالة التقدير
+  getGrade() {
+    const avg = this.getAverage();
+    if (avg >= 90) return "A";
+    else if (avg >= 80) return "B";
+    else if (avg >= 70) return "C";
+    else if (avg >= 60) return "D";
+    else if (avg >= 50) return "E";
+    else return "F";
+  }
+
+  // دالة النتيجة النهائية
+  getFinalResult() {
+    const avg = this.getAverage();
+    if (avg >= 50 && this.attendance >= 75) {
+      return "ناجح";
+    } else {
+      return "يحتاج مراجعة";
+    }
+  }
+}
+
+// 3. نظام تشغيل الجامعة - المصفوفة الرئيسية
+const studentsList = [
+  new Student(101, "ليلو", [85, 90, 88], 92),
+  new Student(102, "أحمد", [45, 42, 48], 80), // متعثر
+  new Student(103, "سارة", [55, 60, 58], 70), // حضور قليل
+  new Student(104, "محمد", [40, 44, 41], 88)  // متعثر
+];
+
+// 5. المخرجات - تقرير كل طالب
+console.log("===== تقرير الطلاب الرئيسي =====");
+studentsList.forEach(student => {
+  console.log(
+    `الاسم: ${student.name} | المتوسط: ${student.getAverage().toFixed(2)} | التقدير: ${student.getGrade()} | النتيجة: ${student.getFinalResult()}`
+  );
+});
+
+// 4. لجنة الرأفة
+console.log("\n===== لجنة الرأفة =====");
+
+// الاستخراج: filter للمتعثرين من 40 لـ 49
+const failingStudents = studentsList.filter(student => {
+  const avg = student.getAverage();
+  return avg >= 40 && avg <= 49;
+});
+
+console.log("الطلاب المتعثرون (قبل الرأفة):", failingStudents.map(s => `${s.name} - متوسطه: ${s.getAverage()}`));
+
+// المعالجة: map لإضافة 5 درجات رأفة
+const afterRafa = failingStudents.map(student => {
+  return {
+    name: student.name,
+    oldAverage: student.getAverage(),
+    newAverage: student.getAverage() + 5
+  };
+});
+
+console.log("الطلاب بعد إضافة 5 درجات رأفة:", afterRafa);
+
+// التحليل: reduce لجمع المتوسطات الجديدة
+const totalNewAverage = afterRafa.reduce((acc, student) => acc + student.newAverage, 0);
+
+// متوسط الرأفة مع درع الحماية من القسمة على صفر
+const rafaAverage = afterRafa.length > 0 ? totalNewAverage / afterRafa.length : 0;
+
+console.log(`\nمتوسط درجات الطلاب المتعثرين بعد التعديل: ${rafaAverage.toFixed(2)}`);
+
+if(afterRafa.length === 0){
+    console.log("تنبيه: لا يوجد طلاب متعثرين، تم تفعيل درع الحماية من القسمة على صفر");
+}
+</script>
+</body>
+</html>
